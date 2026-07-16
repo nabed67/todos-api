@@ -3,8 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpException,
-  HttpStatus,
   Param,
   ParseIntPipe,
   Post,
@@ -23,25 +21,14 @@ export class TodosController {
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    const todo = await this.todosService.findOne(id);
-
-    if (!todo) {
-      return new HttpException('Todo not found', HttpStatus.NOT_FOUND);
-    }
-
-    return todo;
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.todosService.findOne(id);
   }
 
   @Post()
+  // @UsePipes(new ValidationPipe({ whitelist: true }))
   create(@Body() body: CreateTodoDto) {
-    const { title } = body;
-
-    if (!title || title.trim() === '') {
-      throw new HttpException('Invalid title', HttpStatus.BAD_REQUEST);
-    }
-
-    return this.todosService.create(title);
+    return this.todosService.create(body);
   }
 
   @Put(':id')
@@ -49,27 +36,12 @@ export class TodosController {
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateTodoDto,
   ) {
-    const { completed } = body;
-
-    const updatedTodo = await this.todosService.update(id, completed);
-
-    if (!updatedTodo) {
-      return new HttpException('Todo not found', HttpStatus.NOT_FOUND);
-    }
-
-    console.log('Updated Todo:', updatedTodo);
-
-    return updatedTodo;
+    return this.todosService.update(id, body);
   }
 
   @Delete(':id')
   async deleteOne(@Param('id', ParseIntPipe) id: number) {
     const deletedTodo = await this.todosService.deleteOne(id);
-
-    if (!deletedTodo) {
-      return new HttpException('Todo not found', HttpStatus.NOT_FOUND);
-    }
-
     return deletedTodo;
   }
 }
