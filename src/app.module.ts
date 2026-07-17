@@ -1,18 +1,23 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { AppController } from '@/app.controller';
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 import { AppService } from '@/app.service';
+import { AppController } from '@/app.controller';
 import { TodosModule } from '@/todos/todos.module';
-import { TodoLoggerMiddleware } from './middlewares/todo-logger.middleware';
 
 @Module({
-  imports: [TodosModule],
+  imports: [
+    TypeOrmModule.forRoot({
+      type: 'better-sqlite3',
+      database: 'db.sqlite',
+      autoLoadEntities: true,
+      synchronize: true, // dev only
+    }),
+    ConfigModule.forRoot({ isGlobal: true }),
+    TodosModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
   exports: [],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    // consumer.apply(TodoLoggerMiddleware).forRoutes('*');
-    consumer.apply(TodoLoggerMiddleware).forRoutes('todos');
-  }
-}
+export class AppModule {}

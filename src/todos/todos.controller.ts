@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Post,
   Put,
 } from '@nestjs/common';
@@ -16,12 +15,12 @@ export class TodosController {
   constructor(private readonly todosService: TodosService) {}
 
   @Get()
-  findAll() {
-    return this.todosService.findAll();
+  find() {
+    return this.todosService.find();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id') id: string) {
     return this.todosService.findOne(id);
   }
 
@@ -32,15 +31,12 @@ export class TodosController {
   }
 
   @Put(':id')
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() body: UpdateTodoDto,
-  ) {
+  async update(@Param('id') id: string, @Body() body: UpdateTodoDto) {
     return this.todosService.update(id, body);
   }
 
   @Delete(':id')
-  async deleteOne(@Param('id', ParseIntPipe) id: number) {
+  async deleteOne(@Param('id') id: string) {
     const deletedTodo = await this.todosService.deleteOne(id);
     return deletedTodo;
   }

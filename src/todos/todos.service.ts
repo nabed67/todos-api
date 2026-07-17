@@ -1,67 +1,45 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Todo } from './todos.interface';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Todo } from './todo.entity';
 import { CreateTodoDto, UpdateTodoDto } from './todos.dto';
 
 @Injectable()
 export class TodosService {
-  private todos: Todo[] = [
-    {
-      id: 1,
-      title: 'Buy groceries',
-      completed: false,
-      description: 'Milk, eggs, bread, and coffee',
-    },
-    {
-      id: 2,
-      title: 'Finish NestJS tutorial',
-      completed: true,
-    },
-    {
-      id: 3,
-      title: 'Book dentist appointment',
-      completed: false,
-      description: 'Call clinic before Friday',
-    },
-  ];
+  constructor(
+    @InjectRepository(Todo)
+    private readonly todoRepository: Repository<Todo>,
+  ) {}
 
-  findAll(): Promise<Todo[]> {
-    return Promise.resolve(this.todos);
+  find(): Promise<Todo[]> {
+    return this.todoRepository.find();
   }
 
-  findOne(id: number): Promise<Todo> {
-    const todo = this.todos.find((t) => t.id === id);
+  async findOne(id: string): Promise<Todo> {
+    const todo = await this.todoRepository.findOneBy({ id });
     if (!todo) {
       throw new NotFoundException(`Todo with id ${id} not found`);
     }
 
-    return Promise.resolve(todo);
+    return todo;
   }
 
   create(body: CreateTodoDto): Promise<Todo> {
-    const newTodo: Todo = {
-      title: body.title,
-      description: body.description,
-      completed: false,
-      id: this.todos.length + 1,
-    };
-
-    this.todos.push(newTodo);
-    return Promise.resolve(newTodo);
+    const newTodo = this.todoRepository.create(body);
+    return this.todoRepository.save(newTodo);
   }
 
-  async update(id: number, body: UpdateTodoDto): Promise<Todo | undefined> {
+  async update(id: string, body: UpdateTodoDto): Promise<Todo> {
     const todo = await this.findOne(id);
     Object.assign(todo, body);
-    return Promise.resolve(todo);
+    return this.todoRepository.save(todo);
   }
 
-  deleteOne(id: number): Promise<Todo | undefined> {
-    const index = this.todos.findIndex((todo) => todo.id === id);
+  async deleteOne(id: string): Promise<void> {
+    const result = await this.todoRepository.delete({ id });
 
-    if (index === -1) {
+    if (result.affected === 0) {
       throw new NotFoundException(`Todo with id ${id} not found`);
     }
-    const deletedTodo = this.todos.splice(index, 1)[0];
-    return Promise.resolve(deletedTodo);
   }
 }
