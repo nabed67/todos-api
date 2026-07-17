@@ -6,17 +6,19 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { TodosService } from './todos.service';
 import { CreateTodoDto, UpdateTodoDto } from './todos.dto';
+import { PaginatedQueryDto } from '@/common/dto/pagination-query.dto';
 
 @Controller('todos')
 export class TodosController {
   constructor(private readonly todosService: TodosService) {}
 
   @Get()
-  find() {
-    return this.todosService.find();
+  find(@Query() query: PaginatedQueryDto) {
+    return this.todosService.find(query);
   }
 
   @Get(':id')

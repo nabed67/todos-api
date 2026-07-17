@@ -1,8 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Todo } from './todo.entity';
+import { PaginatedQueryDto } from '@/common/dto/pagination-query.dto';
+import { PaginatedResult } from '@/common/interfaces/paginated-result.interface';
 import { CreateTodoDto, UpdateTodoDto } from './todos.dto';
+import { Todo } from './todo.entity';
 
 @Injectable()
 export class TodosService {
@@ -11,8 +13,27 @@ export class TodosService {
     private readonly todoRepository: Repository<Todo>,
   ) {}
 
-  find(): Promise<Todo[]> {
-    return this.todoRepository.find();
+  async find(query: PaginatedQueryDto): Promise<PaginatedResult<Todo>> {
+    const { page = 1, limit = 10 } = query;
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await this.todoRepository.findAndCount({
+      skip,
+      take: limit,
+      order: { id: 'ASC' },
+    });
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages,
+      },
+    };
   }
 
   async findOne(id: string): Promise<Todo> {
