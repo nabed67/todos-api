@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppService } from '@/app.service';
 import { AppController } from '@/app.controller';
 import { TodosModule } from '@/todos/todos.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { TodosModule } from '@/todos/todos.module';
     }),
     ConfigModule.forRoot({ isGlobal: true }),
     TodosModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

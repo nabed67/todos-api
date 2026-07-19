@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -27,6 +29,7 @@ export class TodosController {
   }
 
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   // @UsePipes(new ValidationPipe({ whitelist: true }))
   create(@Body() body: CreateTodoDto) {
     return this.todosService.create(body);
