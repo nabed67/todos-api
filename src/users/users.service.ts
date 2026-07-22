@@ -28,8 +28,18 @@ export class UsersService {
   }
 
   async create(body: CreateUserDto): Promise<User> {
+    const findUser = await this.usersRepository.findOneBy({
+      email: body.email,
+    });
+
+    if (findUser) {
+      throw new BadRequestException(
+        'Please check the provided id and try again',
+      );
+    }
+
     const createUser = this.usersRepository.create(body);
-    return await this.usersRepository.save(createUser);
+    return this.usersRepository.save(createUser);
   }
 
   async update(id: string, body: UpdateUserDto): Promise<User> {
@@ -40,6 +50,30 @@ export class UsersService {
 
   async delete(id: string): Promise<void> {
     const result = await this.usersRepository.delete({ id });
+    if (result.affected === 0) {
+      throw new BadRequestException(
+        'Please check the provided id and try again',
+      );
+    }
+  }
+
+  async findByEmail(email: string): Promise<User> {
+    const findUser = await this.usersRepository.findOneBy({ email });
+    if (!findUser) {
+      throw new BadRequestException(
+        'Please check the provided id and try again',
+      );
+    }
+
+    return findUser;
+  }
+
+  async updateHashRefreshToken(userId: string, token: string) {
+    const result = await this.usersRepository.update(
+      { id: userId },
+      { currentHashedRefreshToken: token },
+    );
+
     if (result.affected === 0) {
       throw new BadRequestException(
         'Please check the provided id and try again',

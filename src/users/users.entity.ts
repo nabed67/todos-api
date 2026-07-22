@@ -8,6 +8,11 @@ import {
 } from 'typeorm';
 import bcrypt from 'bcryptjs';
 
+export enum UserRole {
+  USER = 'User',
+  ADMIN = 'Admin',
+}
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -24,6 +29,19 @@ export class User {
 
   @Column({ nullable: true })
   image?: string;
+
+  @Column({
+    type: 'simple-enum',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  role: UserRole;
+
+  @Column({ nullable: true })
+  currentHashedRefreshToken: string;
+
+  @Column({ default: 0 })
+  tokenVersion: number;
 
   @CreateDateColumn()
   createdAt: Date;
