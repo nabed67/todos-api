@@ -1,23 +1,14 @@
-import {
-  BeforeInsert,
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { BeforeInsert, Column, Entity } from 'typeorm';
 import bcrypt from 'bcryptjs';
+import { BaseEntity } from '@/database/base.entity';
 
 export enum UserRole {
   USER = 'User',
   ADMIN = 'Admin',
 }
 
-@Entity()
-export class User {
-  @PrimaryGeneratedColumn()
-  id!: string;
-
+@Entity('users')
+export class User extends BaseEntity {
   @Column({ length: 255 })
   name!: string;
 
@@ -42,12 +33,6 @@ export class User {
 
   @Column({ default: 0 })
   tokenVersion!: number;
-
-  @CreateDateColumn()
-  createdAt!: Date;
-
-  @UpdateDateColumn()
-  updatedAt!: Date;
 
   @BeforeInsert()
   async hashPassword() {

@@ -2,6 +2,7 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 
 export const PayloadValidationPipe = new ValidationPipe({
   whitelist: true,
+  transform: true,
   stopAtFirstError: true,
   exceptionFactory: (errors) => {
     const formattedErrors = errors.reduce(

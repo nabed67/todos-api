@@ -9,13 +9,15 @@ import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcryptjs';
 import { User } from '@/users/users.entity';
 import { UsersService } from '@/users/users.service';
-import { loginDto, RegisterDto } from './auth.dto';
+import { LoginDto } from '@/auth/dto/login.dto';
+import { RegisterDto } from '@/auth/dto/register.dto';
 import {
   AuthResponse,
   LoginResponse,
   TokenPayload,
   TokensResponse,
 } from './auth.interface';
+import { JWT_ACCESS_TOKEN, JWT_REFRESH_TOKEN } from './constants';
 
 @Injectable()
 export class AuthService {
@@ -25,16 +27,16 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async login(body: loginDto): Promise<LoginResponse> {
+  async login(body: LoginDto): Promise<LoginResponse> {
     const { email, password } = body;
 
     const user = await this.validateUser(email, password);
-    const { accessToken, refreshToken } = this.generateTokens(user);
-    await this.storeRefreshToken(user.id, refreshToken);
+    const tokens = this.generateTokens(user);
+    await this.storeRefreshToken(user.id, tokens.refreshToken);
 
     return {
-      accessToken,
-      refreshToken,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
       user: {
         id: user.id,
         role: user.role,
@@ -46,16 +48,13 @@ export class AuthService {
 
   async register(body: RegisterDto): Promise<AuthResponse> {
     await this.usersService.create(body);
-    return {
-      success: true,
-      message: 'User registered successfully',
-    };
+    return { message: 'User registered successfully' };
   }
 
   // logout() {}
 
   async refresh(oldToken: string): Promise<TokensResponse> {
-    const secret = this.configService.get<string>('JWT_REFRESH_SECRET')!;
+    const secret = this.configService.get<string>(JWT_REFRESH_TOKEN)!;
 
     const payload = this.jwtService.verify<TokenPayload>(oldToken, { secret });
 
@@ -103,12 +102,12 @@ export class AuthService {
     };
 
     const accessToken = this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('JWT_ACCESS_TOKEN'),
+      secret: this.configService.get<string>(JWT_ACCESS_TOKEN),
       expiresIn: '15m',
     });
 
     const refreshToken = this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('JWT_REFRESH_TOKEN'),
+      secret: this.configService.get<string>(JWT_REFRESH_TOKEN),
       expiresIn: '7days',
     });
 

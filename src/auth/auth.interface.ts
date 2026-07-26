@@ -2,7 +2,6 @@ import { UserRole } from '@/users/users.entity';
 
 export interface AuthResponse {
   message: string;
-  success: boolean;
 }
 
 export interface LoginResponse {

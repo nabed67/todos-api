@@ -2,12 +2,14 @@ import { Transform } from 'class-transformer';
 import {
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
+  IsUrl,
   Length,
   MaxLength,
 } from 'class-validator';
 
-export class RegisterDto {
+export class CreateUserDto {
   @Transform(({ value }: { value: string }) =>
     typeof value === 'string' ? value.trim() : value,
   )
@@ -31,22 +33,9 @@ export class RegisterDto {
   @IsNotEmpty({ message: 'Password is required!' })
   @IsString()
   password!: string;
-}
 
-export class loginDto {
-  @MaxLength(100, { message: 'Email maximum 100 characters long' })
-  @Transform(({ value }: { value: string }) =>
-    typeof value === 'string' ? value.trim() : value,
-  )
-  @IsNotEmpty({ message: 'Email is required!' })
-  @IsEmail()
   @IsString()
-  email!: string;
-
-  @Length(4, 16, {
-    message: 'Password must be between 4 and 16 characters long',
-  })
-  @IsNotEmpty({ message: 'Password is required!' })
-  @IsString()
-  password!: string;
+  @IsOptional()
+  @IsUrl()
+  image?: string;
 }

@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import type { Request } from 'express';
 import { TokenPayload } from '@/auth/auth.interface';
+import { JWT_ACCESS_TOKEN } from '@/auth/constants';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -41,7 +42,7 @@ export class AuthGuard implements CanActivate {
 
   private verifyJwtToken(token: string) {
     return this.jwtService.verifyAsync<TokenPayload>(token, {
-      secret: this.configService.get<string>('JWT_ACCESS_TOKEN'),
+      secret: this.configService.get<string>(JWT_ACCESS_TOKEN),
     });
   }
 }
