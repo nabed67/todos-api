@@ -19,6 +19,7 @@ import { AuthGuard } from '@/auth/guards/auth.guard';
 import { Roles, RolesGuard } from '@/auth/guards/roles.guard';
 
 @Controller('users')
+@UseGuards(AuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -29,7 +30,6 @@ export class UsersController {
     return this.usersService.find();
   }
 
-  @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
@@ -39,19 +39,17 @@ export class UsersController {
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(UserExistsPipe)
   @Roles(UserRole.ADMIN)
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   create(@Body() body: CreateUserDto) {
     return this.usersService.create(body);
   }
 
   @Put(':id')
-  @UseGuards(AuthGuard)
   update(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return this.usersService.update(id, body);
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard)
   delete(@Param('id') id: string) {
     return this.usersService.delete(id);
   }

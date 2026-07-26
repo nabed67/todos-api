@@ -1,29 +1,20 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { AppService } from '@/app.service';
-import { AppController } from '@/app.controller';
+import { AuthModule } from '@/auth/auth.module';
 import { TodosModule } from '@/todos/todos.module';
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
+import { UsersModule } from '@/users/users.module';
+import { DatabaseModule } from '@/database/database.module';
 
 @Module({
   imports: [
     AuthModule,
     TodosModule,
     UsersModule,
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
-    TypeOrmModule.forRoot({
-      type: 'better-sqlite3',
-      database: 'db.sqlite',
-      autoLoadEntities: true,
-      synchronize: true, // dev only
-    }),
+    DatabaseModule,
+    ConfigModule.forRoot({ isGlobal: true }),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
   exports: [],
 })
 export class AppModule {}

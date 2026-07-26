@@ -16,16 +16,16 @@ export enum UserRole {
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id: string;
+  id!: string;
 
   @Column({ length: 255 })
-  name: string;
+  name!: string;
 
   @Column({ length: 255, unique: true })
-  email: string;
+  email!: string;
 
   @Column({ length: 255 })
-  password: string;
+  password!: string;
 
   @Column({ nullable: true })
   image?: string;
@@ -35,19 +35,19 @@ export class User {
     enum: UserRole,
     default: UserRole.USER,
   })
-  role: UserRole;
+  role!: UserRole;
 
   @Column({ nullable: true })
-  currentHashedRefreshToken: string;
+  currentHashedRefreshToken?: string;
 
   @Column({ default: 0 })
-  tokenVersion: number;
+  tokenVersion!: number;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 
   @BeforeInsert()
   async hashPassword() {
